@@ -1,0 +1,15 @@
+#1731505298511 | took 19ms | statement | connection 1| url jdbc:postgresql://localhost:5432/matou
+select * from information_schema.sequences
+select * from information_schema.sequences;
+#1731505298604 | took 2ms | statement | connection 1| url jdbc:postgresql://localhost:5432/matou
+select * from "public"."projet" where 1=0
+select * from "public"."projet" where 1=0;
+#1731505298620 | took 2ms | statement | connection 1| url jdbc:postgresql://localhost:5432/matou
+select * from "public"."users" where 1=0
+select * from "public"."users" where 1=0;
+#1731505298651 | took 1ms | statement | connection 1| url jdbc:postgresql://localhost:5432/matou
+select * from "public"."projet" where 1=0
+select * from "public"."projet" where 1=0;
+#1731505298657 | took 2ms | statement | connection 1| url jdbc:postgresql://localhost:5432/matou
+select * from "public"."users" where 1=0
+select * from "public"."users" where 1=0;

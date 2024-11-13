@@ -1,8 +1,6 @@
 package com.exo1.exo1.controller;
 
-import com.exo1.exo1.dto.TaskDto;
 import com.exo1.exo1.dto.UserDto;
-import com.exo1.exo1.service.TaskService;
 import com.exo1.exo1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +15,18 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> findAll()
-    {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<List<UserDto>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+       return ResponseEntity.ok(userService.findAll(page, size));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> findById(@PathVariable Long id)
     {
-        return ResponseEntity.ok(userService.findById(id));
+        UserDto user = userService.findById(id);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping

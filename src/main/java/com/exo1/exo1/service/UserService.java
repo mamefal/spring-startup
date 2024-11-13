@@ -8,7 +8,7 @@ import com.exo1.exo1.repository.TaskRepository;
 import com.exo1.exo1.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -22,38 +22,46 @@ public class UserService {
     private ProjetRepository projetRepository;
     private UserMapper userMapper;
     
-    public List<UserDto> findAll() {
+    public List<UserDto> findAll(int page, int size) {
         return userMapper.toDtos(userRepository.findAll());
     }
 
     public UserDto findById(long id) {
-        return userMapper.toDto(userRepository.findByIdWithTask(id).orElse(null));
+        User user = userRepository.findById(id).orElseThrow(() ->
+                new EmptyResultDataAccessException("User not found with id " + id, 1));
+        return userMapper.toDto(user);
     }
+
 
     public UserDto save(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
-        user.getProjets().stream().forEach(projet -> {
-                    projet.getTasks().stream().forEach(task -> {task.setProjet(projet);});
-                });
+
+        user.getProjets().forEach(projet ->
+                projet.getTasks().forEach(task -> task.setProjet(projet)));
+
         return userMapper.toDto(userRepository.save(user));
     }
 
+
     public UserDto update(Long id, UserDto userDto) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found with id " + id));
+                .orElseThrow(() -> new EmptyResultDataAccessException("User not found with id " + id, 1));
+
         userDto.setId(existingUser.getId());
         User userUpdated = userMapper.toEntity(userDto);
-        userUpdated.getProjets().stream().forEach(projet -> {
-            if(projetRepository.findById(projet.getId()).isPresent()) {
+
+
+        userUpdated.getProjets().forEach(projet -> {
+            if (projetRepository.existsById(projet.getId())) {
                 projet.setUsers(new HashSet<>(Collections.singleton(userUpdated)));
-                projet.getTasks().stream().forEach(
-                        task -> {
-                            if(taskRepository.findById(task.getId()).isPresent()) {
-                                task.setProjet(projet);
-                            }
-                        });
+                projet.getTasks().forEach(task -> {
+                    if (taskRepository.existsById(task.getId())) {
+                        task.setProjet(projet);
+                    }
+                });
             }
         });
+
         return userMapper.toDto(userRepository.save(userUpdated));
     }
 
