@@ -7,6 +7,8 @@ import com.exo1.exo1.repository.ProjetRepository;
 import com.exo1.exo1.repository.TaskRepository;
 import com.exo1.exo1.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -25,6 +27,8 @@ public class UserService {
     public List<UserDto> findAll(int page, int size) {
         return userMapper.toDtos(userRepository.findAll());
     }
+
+    @Cacheable("users")
 
     public UserDto findById(long id) {
         User user = userRepository.findById(id).orElseThrow(() ->
@@ -65,6 +69,7 @@ public class UserService {
         return userMapper.toDto(userRepository.save(userUpdated));
     }
 
+    @CacheEvict(value = "users", key = "#id")
     public void delete(Long id) {
         userRepository.deleteById(id);
     }
